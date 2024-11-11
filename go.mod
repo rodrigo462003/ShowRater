@@ -1,4 +1,4 @@
-module showRater
+module rax/ShowRater
 
 go 1.23.3
 
