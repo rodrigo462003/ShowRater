@@ -26,3 +26,6 @@ go.work.sum
 
 #tmp folder
 tmp/
+
+#node modules
+node_modules/

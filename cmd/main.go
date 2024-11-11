@@ -1,7 +1,7 @@
 package main
 
 import (
-	"rax/ShowRater/cmd/templates"
+	"rax/ShowRater/internal/templates"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -14,6 +14,7 @@ func indexGetHandler(c echo.Context) error{
 func setupRoutes(e *echo.Echo){
 	e.File("/favicon.ico","images/favicon.ico")
 	e.Static("/css", "css")
+
 	e.GET("/", indexGetHandler)
 }
 
@@ -26,4 +27,3 @@ func main() {
 
 	e.Logger.Fatal(e.Start(":8000"))
 }
-
