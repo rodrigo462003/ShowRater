@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Go application service
+  app:
+    build: .
+    container_name: go-app
+    volumes:
+      - .:/app  # Mount the current directory to the /app directory in the container
+    ports:
+      - "8000:8000"  # Exposes port for your Go app
+    depends_on:
+      - db  # Ensures the DB is started first
+    environment:
+      - DB_HOST=db  # Pass the DB container name as an environment variable
+      - DB_PORT=5432 # Default PostgreSQL port
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_NAME=ShowRater
+
+  # Database service (PostgreSQL in this case)
+  db:
+    image: postgres:13  # You can use a different database if needed
+    container_name: db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ShowRater
+    ports:
+      - "5432:5432"  # Exposes the DB port for local access
+    volumes:
+      - ./database:/var/lib/postgresql/data  # Mounts the same local data directory to PostgreSQL data directory
+      - ./data/scripts:/docker-entrypoint-initdb.d  # Mount your scripts
