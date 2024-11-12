@@ -1,15 +1,6 @@
 {
-  "name": "showrater",
-  "version": "1.0.0",
-  "description": "Home project for now!",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.9",
     "tailwindcss": "^3.4.14"
   }
 }
