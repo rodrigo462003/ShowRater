@@ -57,29 +57,12 @@ func setupRoutes(e *echo.Echo, db *sql.DB){
 	})
 }
 
-func getConnectionString() (connStr string, err error){
-	err = godotenv.Load()
-	if err != nil {
-        return connStr, fmt.Errorf("couldn't find environment variable CONN_STR")
-	}
-
-	connStr, found := os.LookupEnv("CONN_STR")
-    if !found {
-        return connStr, fmt.Errorf("couldn't find environment variable CONN_STR")
-    }
-
-	return
-}
-
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Renderer = templates.NewTemplate()
 
-	connectionString, err := getConnectionString()
-	if(err != nil){
-		e.Logger.Fatal(err.Error())
-	}
+	connectionString := "postgres://admin:admin@db:5432/?sslmode=disable"
 
 	db, err := database.GetConnectionPool(connectionString)
 	if(err != nil){
