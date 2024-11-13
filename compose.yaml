@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  tailwind:
+    tty: true
+    build:
+      context: .
+      dockerfile: dockerfile.tailwind  # Use the custom Dockerfile for Tailwind
+    volumes:
+      - .:/app  # Mount the current directory into the container to watch changes
+      - ./css:/app/css # Maps the 'src' folder where the CSS output is
+    command: ["npx", "tailwindcss", "-i", "./css/styleSource.css", "-o", "./css/style.css", "--watch", "--poll"]
+    depends_on:
+      - db  # Wait for the PostgreSQL service to be ready
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ShowRater
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./data/scripts/createUsersTable.sql:/docker-entrypoint-initdb.d/createUsersTable.sql
+    ports:
+      - "5432:5432"
+
+  go-app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    environment:
+      - DATABASE_URL=postgres://admin:admin@db/ShowRater?sslmode=disable
+    volumes:
+      - .:/app
+      - ./css:/app/css
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - tailwind
+    command: air
+
+volumes:
+  postgres-data:
+

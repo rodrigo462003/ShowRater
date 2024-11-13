@@ -32,3 +32,6 @@ node_modules/
 
 #docker database volume
 .database
+
+#tailwind output
+css/style.css
