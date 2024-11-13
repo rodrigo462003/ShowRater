@@ -1,15 +1,20 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
+	"os"
+	"rax/ShowRater/internal/database"
 	"rax/ShowRater/internal/templates"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func registerGetHandler(c echo.Context) error{
 	if !(c.Request().Header.Get("HX-Request") == "true"){
-		return c.String(403,"403 Forbidden")
+		return c.NoContent(403)
 	}
 	return c.Render(200,"registerModal", nil)
 }
@@ -18,25 +23,52 @@ func indexGetHandler(c echo.Context) error{
 	return c.Render(200, "index", nil)
 }
 
-func usernamePutHandler(c echo.Context) error{
+func usernameCheckHandler(c echo.Context, db *sql.DB) (err error){
 	if !(c.Request().Header.Get("HX-Request") == "true"){
-		return c.String(403,"403 Forbidden")
-	}
-	username := c.FormValue("username")
-	if !(len(username) > 0){
-		return c.NoContent(200)
+		return c.NoContent(403)
 	}
 
-	return c.NoContent(400)
+	username := c.FormValue("username")
+	uLen := len(username)
+	if !(30 >= uLen && uLen >= 4){
+		errorMessage := "Error"
+		return c.Render(422,"usernameError", errorMessage)
+	}
+
+	exists, err := database.UserNameExists(username, db)
+	if err != nil{
+		c.NoContent(500)
+	}
+	if exists {
+		return c.String(409,"Username already exists")
+	}
+
+	return c.NoContent(204)
 }
 
-func setupRoutes(e *echo.Echo){
+func setupRoutes(e *echo.Echo, db *sql.DB){
 	e.File("/favicon.ico","images/favicon.ico")
 	e.Static("/css", "css")
 
 	e.GET("/", indexGetHandler)
 	e.GET("/registerModal", registerGetHandler)
-	e.POST("/registerModal/username", usernamePutHandler)
+	e.POST("/registerModal/username", func(c echo.Context) error{
+		return usernameCheckHandler(c, db)
+	})
+}
+
+func getConnectionString() (connStr string, err error){
+	err = godotenv.Load()
+	if err != nil {
+        return connStr, fmt.Errorf("couldn't find environment variable CONN_STR")
+	}
+
+	connStr, found := os.LookupEnv("CONN_STR")
+    if !found {
+        return connStr, fmt.Errorf("couldn't find environment variable CONN_STR")
+    }
+
+	return
 }
 
 func main() {
@@ -44,7 +76,17 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Renderer = templates.NewTemplate()
 
-	setupRoutes(e)
+	connectionString, err := getConnectionString()
+	if(err != nil){
+		e.Logger.Fatal(err.Error())
+	}
+
+	db, err := database.GetConnectionPool(connectionString)
+	if(err != nil){
+		e.Logger.Fatal(err.Error())
+	}
+
+	setupRoutes(e,db)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

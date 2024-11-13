@@ -2,25 +2,28 @@ package database
 
 import (
 	"database/sql"
-	"log"
-	"os"
+	"fmt"
+	"strings"
 
-	_"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-
-func getConnection() *sql.DB{
-	connStr, found := os.LookupEnv("CONN_STR")
-	if !found{
-		log.Fatalln("Missing environment variable CONN_STR")
-	}
-
-	db, err := sql.Open("pgx", connStr)
+func GetConnectionPool(connectionString string) ( db *sql.DB , err error){
+	db, err = sql.Open("pgx", connectionString)
 	if err != nil{
-		log.Fatalf("Unable to connect to database because %s", err)
+		return nil, fmt.Errorf("unable to connect to the database because: %v", err)
 	}
-	if err = db.Ping(); err != nil {
-		log.Fatalf("Cannot ping database because %s", err)
-    }
-	return db
+
+	return
 }
+
+func UserNameExists(username string, db *sql.DB) (exists bool, err error) {
+    username = strings.ToUpper(username)
+    err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", username).Scan(&exists)
+    if err != nil {
+        return false, fmt.Errorf("Couldn't query the DB")
+    }
+
+    return
+}
+
