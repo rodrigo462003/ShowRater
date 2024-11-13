@@ -2,12 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
-	"os"
 	"rax/ShowRater/internal/database"
 	"rax/ShowRater/internal/templates"
 
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -62,7 +59,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Renderer = templates.NewTemplate()
 
-	connectionString := "postgres://admin:admin@db:5432/?sslmode=disable"
+	connectionString := "postgres://admin:admin@db:5432/ShowRater?sslmode=disable"
 
 	db, err := database.GetConnectionPool(connectionString)
 	if(err != nil){
