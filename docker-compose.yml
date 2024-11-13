@@ -29,5 +29,5 @@ services:
     ports:
       - "5432:5432"  # Exposes the DB port for local access
     volumes:
-      - ./database:/var/lib/postgresql/data  # Mounts the same local data directory to PostgreSQL data directory
+      - ./.database:/var/lib/postgresql/data  # Mounts the same local data directory to PostgreSQL data directory
       - ./data/scripts:/docker-entrypoint-initdb.d  # Mount your scripts

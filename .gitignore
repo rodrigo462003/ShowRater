@@ -29,3 +29,6 @@ tmp/
 
 #node modules
 node_modules/
+
+#docker database volume
+.database
