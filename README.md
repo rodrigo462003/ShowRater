@@ -18,7 +18,7 @@ This repo wants to become a **website** that allows users to **track and rate mo
 1. Clone the repo:
    ```bash
    git clone https://github.com/rodrigo462003/ShowRater/
-2. Buil with docker:
+2. Build and run with docker:
    ```bash
-   sudo docker-compose up --build
-3. Open up the browser and http://localhost:8000/
+   docker compose up
+3. Open up the browser at http://localhost:8000/
