@@ -1,12 +1,15 @@
-FROM node:latest
+FROM node
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
 
-RUN npm install
+RUN npm install -g npm && \
+    npm install
 
-COPY . .
+RUN npm install -g tailwindcss
+
+COPY tailwind.config.js ./
 
 CMD ["npx", "tailwindcss", "-i", "./css/styleSource.css", "-o", "./css/style.css", "--watch"]
 

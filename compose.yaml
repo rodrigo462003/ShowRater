@@ -1,17 +1,15 @@
-version: '3.8'
-
 services:
   tailwind:
     tty: true
     build:
       context: .
-      dockerfile: dockerfile.tailwind  # Use the custom Dockerfile for Tailwind
+      dockerfile: dockerfile.tailwind
     volumes:
-      - .:/app  # Mount the current directory into the container to watch changes
-      - ./css:/app/css # Maps the 'src' folder where the CSS output is
-    command: ["npx", "tailwindcss", "-i", "./css/styleSource.css", "-o", "./css/style.css", "--watch", "--poll"]
+      - ./views:/app/views
+      - ./css:/app/css
+    command: ["npx", "tailwindcss", "-i", "./css/styleSource.css", "-o", "./css/style.css", "--watch"]
     depends_on:
-      - db  # Wait for the PostgreSQL service to be ready
+      - db
 
   db:
     image: postgres:latest
